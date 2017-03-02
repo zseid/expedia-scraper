@@ -14,7 +14,7 @@ class ExpediaScraper():
 
     def getargs(self):
         
-        """
+        
         self.departfrom = input("Flying From (e.g, SFO): ")
         self.flyto = input("Flying To: ")
         self.departdate = input("Departure Date (e.g, 03/02/2017): ")
@@ -35,13 +35,6 @@ class ExpediaScraper():
         
         Get max price
         self.desiredprice = input("What's the maximum you'd like to spend in dollars? (e.g. 550): ")
-        """
-        self.departfrom = "SFO"
-        self.flyto = "LAS"
-        self.departdate = "03/02/2017"
-        self.returndate = "03/04/2017"
-        self.passengers = "4"
-
         
         self.searchsite()
     
