@@ -1,5 +1,6 @@
 import time
 from selenium import webdriver
+from datetime import datetime
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -9,12 +10,13 @@ from selenium.common.exceptions import TimeoutException
 class ExpediaScraper():
 
     def main(self):
-        print("\nI'll help you lookup the cheapest roundtrip ticket on expedia.com\n")
-        self.getargs()
+        while True:
+            self.searchsite()
+            time.sleep(3600) #Check prices once ever hour
 
     def getargs(self):
         
-        """
+
         self.departfrom = input("Flying From (e.g, SFO): ")
         self.flyto = input("Flying To: ")
         self.departdate = input("Departure Date (e.g, 03/02/2017): ")
@@ -33,19 +35,12 @@ class ExpediaScraper():
                     print("Still not in range. Try Again.")
         
         #Get max price
-        self.desiredprice = input("What's the maximum you'd like to spend in dollars? (e.g. 550): ")
-        """
-        self.departfrom = "SFO"
-        self.flyto = "LAS"
-        self.departdate = "03/03/2017"
-        self.returndate = "03/06/2017"
-        self.passengers = "2"
-        self.desiredprice = 310
-
+        self.desiredprice = input("What's the maximum you'd like to spend in dollars? (e.g. 550): 
+                                  
         self.searchsite()
     
     def searchsite(self):
-        driver = webdriver.Firefox()
+        driver = webdriver.PhantomJS()
         driver.get("http://www.expedia.com")
         
         #Flights only
@@ -74,7 +69,6 @@ class ExpediaScraper():
 
         #Locate and click the search button
         select_search = driver.find_elements_by_class_name('btn-label')[18]
-        print (select_search.text)
         select_search.click()
 
         #Send to scrape function
@@ -90,16 +84,22 @@ class ExpediaScraper():
             finalprice = theprices.text
             price_array.append(finalprice[1:])
         min_price = min(price_array)
-
+        #compare the min of the array against our desired price
         if int(min_price) <= self.desiredprice:
             self.notifyuser(min_price)
         else:
+            print("No match found in this run. We'll try again.")
+            driver.quit() #close the driver to prepare for the next attempt
             return
 
     def notifyuser(self, min_price):
-        print("We found a steal!", min_price)
+        current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        print("\nWe found a steal!", min_price,"for roundtrip from",self.departfrom,"to",self.flyto, current_time)
+        SystemExit() #our job is done here
 
 
 if __name__ == "__main__":
+    print("\nI'll help you lookup the cheapest roundtrip ticket on expedia.com\n")
     scraper = ExpediaScraper()
+    scraper.getargs()
     scraper.main()
