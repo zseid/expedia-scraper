@@ -1,4 +1,4 @@
-import unittest, time
+import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -14,12 +14,11 @@ class ExpediaScraper():
 
     def getargs(self):
         
-        
+        """
         self.departfrom = input("Flying From (e.g, SFO): ")
         self.flyto = input("Flying To: ")
         self.departdate = input("Departure Date (e.g, 03/02/2017): ")
         self.returndate = input("Return Date: ")
-
 
         #Make sure passenger input is correct
         while True:
@@ -33,9 +32,16 @@ class ExpediaScraper():
                 else:
                     print("Still not in range. Try Again.")
         
-        Get max price
+        #Get max price
         self.desiredprice = input("What's the maximum you'd like to spend in dollars? (e.g. 550): ")
-        
+        """
+        self.departfrom = "SFO"
+        self.flyto = "LAS"
+        self.departdate = "03/03/2017"
+        self.returndate = "03/06/2017"
+        self.passengers = "2"
+        self.desiredprice = 310
+
         self.searchsite()
     
     def searchsite(self):
@@ -72,24 +78,26 @@ class ExpediaScraper():
         select_search.click()
 
         #Send to scrape function
+        time.sleep(15)
         self.scrape(driver)
+        
         
     def scrape(self, driver):
         price_array = []
         #get prices
+        prices = driver.find_elements_by_xpath("//span[@class='dollars price-emphasis']")
+        for theprices in prices:
+            finalprice = theprices.text
+            price_array.append(finalprice[1:])
+        min_price = min(price_array)
 
-        try:
-            is_present = EC.presence_of_element_located((By.CLASS_NAME,'tooltip-messsage branded-deal'))
-            WebDriverWait(driver, 40).until(is_present)
-            prices = driver.find_elements_by_xpath("//span[@class='dollars price-emphasis']")
-            for theprices in prices:
-                print (theprices.text)
-        except TimeoutException:
-            print ("Elements not found in a reasonable time.")
+        if int(min_price) <= self.desiredprice:
+            self.notifyuser(min_price)
+        else:
+            return
 
-
-
-
+    def notifyuser(self, min_price):
+        print("We found a steal!", min_price)
 
 
 if __name__ == "__main__":
